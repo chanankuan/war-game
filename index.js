@@ -27,43 +27,46 @@ const values = [
 
 newDeckBtn.addEventListener('click', gameInit);
 
-drawCardBtn.addEventListener('click', () => {
-  fetch(`https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`)
-    .then(res => res.json())
-    .then(data => {
-      cardsContainer.children[0].innerHTML = `
-        <img src=${data.cards[0].image} class="card" />
-      `;
-      cardsContainer.children[1].innerHTML = `
-        <img src=${data.cards[1].image} class="card" />
-      `;
+drawCardBtn.addEventListener('click', async () => {
+  const res = await fetch(
+    `https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`
+  );
+  const data = await res.json();
 
-      displayWinner.textContent = determineCardWinner(data);
-      remainingCards.textContent = `Remaining Cards: ${data.remaining}`;
+  cardsContainer.children[0].innerHTML = `
+    <img src=${data.cards[0].image} class="card" />
+  `;
+  cardsContainer.children[1].innerHTML = `
+    <img src=${data.cards[1].image} class="card" />
+  `;
 
-      if (data.remaining === 0) {
-        drawCardBtn.disabled = true;
-        const winner = determineWinner(computerScore, playerScore);
-        displayWinner.textContent = winner;
+  displayWinner.textContent = determineCardWinner(data);
+  remainingCards.textContent = `Remaining Cards: ${data.remaining}`;
 
-        resetGame();
-      }
-    });
+  if (data.remaining === 0) {
+    drawCardBtn.disabled = true;
+    const winner = determineWinner(computerScore, playerScore);
+    displayWinner.textContent = winner;
+
+    resetGame();
+  }
 });
 
-function gameInit() {
+async function gameInit() {
   resetGame();
+  displayWinner.textContent = 'Game of War';
 
-  fetch('https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/')
-    .then(res => res.json())
-    .then(data => {
-      deckId = data.deck_id;
-      remainingCards.textContent = `Remaining Cards: ${data.remaining}`;
-      drawCardBtn.disabled = false;
+  const res = await fetch(
+    'https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/'
+  );
+  const data = await res.json();
 
-      computerScoreText.textContent = 'Computer score: 0';
-      playerScoreText.textContent = 'My score: 0';
-    });
+  deckId = data.deck_id;
+  remainingCards.textContent = `Remaining Cards: ${data.remaining}`;
+  drawCardBtn.disabled = false;
+
+  computerScoreText.textContent = 'Computer score: 0';
+  playerScoreText.textContent = 'My score: 0';
 }
 
 function determineCardWinner(obj) {
@@ -83,9 +86,9 @@ function determineCardWinner(obj) {
 
 function determineWinner(x, y) {
   return x > y
-    ? 'LOX. Computer wins!'
+    ? 'LOX. Computer wins the game!'
     : x < y
-    ? 'Congratulations! You win!'
+    ? 'Congratulations! You win the game!'
     : 'Draw!';
 }
 
